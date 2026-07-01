@@ -338,7 +338,9 @@
     justify-content: center; gap: 10px;
     transition: transform .4s;
   }
-  .gallery-item:hover .gallery-placeholder { transform: scale(1.04); }
+  @media (hover: hover) and (pointer: fine) {
+    .gallery-item:hover .gallery-placeholder { transform: scale(1.04); }
+  }
   .gallery-icon { font-size: 2rem; opacity: .3; }
   .gallery-label {
     font-family: 'Barlow Condensed'; font-size: .75rem;
@@ -350,9 +352,17 @@
     background: rgba(224,0,0,0.85);
     display: flex; align-items: center; justify-content: center;
     opacity: 0; transition: opacity .3s;
+    pointer-events: none;
   }
-  .gallery-item:hover .gallery-overlay { opacity: 1; }
   .gallery-overlay-icon { font-size: 2.5rem; }
+  /* Video items: never show the red tint overlay so it doesn't block the Vimeo player controls */
+  .pkg-video-item .gallery-overlay { display: none; }
+  /* Only trigger the red hover tint on devices with a real mouse (desktop).
+     On touch devices (phones/tablets) :hover gets "stuck" after tapping, which
+     made photos and videos look permanently red-tinted and hard to tap. */
+  @media (hover: hover) and (pointer: fine) {
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+  }
 
   /* ── BOOKING ── */
   #booking { background: var(--black); }
@@ -875,10 +885,12 @@
   .gallery-item {
     transition: transform 0.35s cubic-bezier(0.2,1,0.3,1), box-shadow 0.35s;
   }
-  .gallery-item:hover {
-    transform: scale(1.04);
-    box-shadow: 0 8px 40px rgba(224,0,0,0.3);
-    z-index: 2;
+  @media (hover: hover) and (pointer: fine) {
+    .gallery-item:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 40px rgba(224,0,0,0.3);
+      z-index: 2;
+    }
   }
 
   /* ══ SCROLL INDICATOR pulse ══ */
@@ -1111,8 +1123,10 @@
     display: block;
     transition: transform 0.4s ease;
   }
-  .gallery-item:hover .gallery-img {
-    transform: scale(1.06);
+  @media (hover: hover) and (pointer: fine) {
+    .gallery-item:hover .gallery-img {
+      transform: scale(1.06);
+    }
   }
 
 
