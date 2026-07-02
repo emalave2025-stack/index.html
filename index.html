@@ -366,6 +366,32 @@
   .pkg-video-item .gallery-overlay { align-items: center; justify-content: center; padding: 0; }
   .pkg-video-item .gallery-overlay-icon { display: none; }
 
+  /* Expand button for videos (iframe intercepts clicks, so this sits on top) */
+  .video-expand-btn {
+    position: absolute; bottom: 10px; right: 10px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(0,0,0,0.65); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; cursor: pointer; z-index: 5;
+    pointer-events: auto; opacity: 0.85; transition: opacity .2s, transform .2s;
+  }
+  .video-expand-btn:hover { opacity: 1; transform: scale(1.12); background: var(--red); }
+
+  .lightbox-overlay video, .lightbox-overlay .lightbox-video-wrap {
+    width: min(92vw, 1100px);
+  }
+  .lightbox-video-wrap {
+    position: relative; width: min(92vw, 1100px);
+    aspect-ratio: 16 / 9;
+    box-shadow: 0 0 60px rgba(224,0,0,0.35), 0 20px 60px rgba(0,0,0,0.6);
+    border-radius: 6px; overflow: hidden;
+    transform: scale(0.92); transition: transform .25s ease;
+  }
+  .lightbox-overlay.active .lightbox-video-wrap { transform: scale(1); }
+  .lightbox-video-wrap iframe {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+  }
+
   /* ── LIGHTBOX ── */
   .gallery-item[data-lightbox] { cursor: pointer; }
   .lightbox-overlay {
@@ -1390,6 +1416,7 @@
         <div class="gallery-overlay-icon">▶</div>
         <div class="gallery-pkg-tag">#1 Street Spec</div>
       </div>
+      <div class="video-expand-btn" onclick="openVideoLightbox('https://player.vimeo.com/video/1206005101?h=a57b48ad5b&title=0&byline=0&portrait=0&autoplay=1', event)">⛶</div>
     </div>
     <div class="gallery-item reveal pkg-video-item" data-cat="showroom">
       <iframe src="https://player.vimeo.com/video/1206005103?h=33039f6082&title=0&byline=0&portrait=0" class="gallery-iframe" 
@@ -1399,6 +1426,7 @@
         <div class="gallery-overlay-icon">▶</div>
         <div class="gallery-pkg-tag">#2 Showroom</div>
       </div>
+      <div class="video-expand-btn" onclick="openVideoLightbox('https://player.vimeo.com/video/1206005103?h=33039f6082&title=0&byline=0&portrait=0&autoplay=1', event)">⛶</div>
     </div>
     <div class="gallery-item reveal pkg-video-item" data-cat="drivers">
       <iframe src="https://player.vimeo.com/video/1206005105?h=48939219e5&title=0&byline=0&portrait=0" class="gallery-iframe" 
@@ -1408,6 +1436,7 @@
         <div class="gallery-overlay-icon">▶</div>
         <div class="gallery-pkg-tag">#3 Driver's Tale</div>
       </div>
+      <div class="video-expand-btn" onclick="openVideoLightbox('https://player.vimeo.com/video/1206005105?h=48939219e5&title=0&byline=0&portrait=0&autoplay=1', event)">⛶</div>
     </div>
   </div>
 
@@ -1836,8 +1865,21 @@
   function openLightbox(imgEl) {
     const overlay = document.getElementById('lightboxOverlay');
     const lbImg   = document.getElementById('lightboxImg');
+    document.getElementById('lightboxVideoWrap').style.display = 'none';
+    lbImg.style.display = '';
     lbImg.src = imgEl.src;
     lbImg.alt = imgEl.alt || '';
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function openVideoLightbox(src, e) {
+    if (e) e.stopPropagation();
+    const overlay   = document.getElementById('lightboxOverlay');
+    const videoWrap = document.getElementById('lightboxVideoWrap');
+    const videoFrame = document.getElementById('lightboxVideoFrame');
+    document.getElementById('lightboxImg').style.display = 'none';
+    videoFrame.src = src;
+    videoWrap.style.display = 'block';
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
@@ -1846,6 +1888,9 @@
     const overlay = document.getElementById('lightboxOverlay');
     overlay.classList.remove('active');
     document.body.style.overflow = '';
+    // Stop video playback by clearing the iframe src
+    const videoFrame = document.getElementById('lightboxVideoFrame');
+    videoFrame.src = '';
   }
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeLightbox();
@@ -2000,6 +2045,9 @@
   <div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox(event)">
     <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
     <img id="lightboxImg" src="" alt="" onclick="event.stopPropagation()">
+    <div id="lightboxVideoWrap" class="lightbox-video-wrap" style="display:none;" onclick="event.stopPropagation()">
+      <iframe id="lightboxVideoFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0"></iframe>
+    </div>
   </div>
 
 </body>
